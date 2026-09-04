@@ -1381,13 +1381,12 @@
                 ' = <b>' + fmtINR(stamp) + '</b>';
         }
 
-                function showPaymentBreakdown() {
-            var pb = document.getElementById('paymentBox');
-            if (!pb) { return; }
-            pb.style.display = 'block';
-            updatePaymentBreakdown();
-            fsInitConfirmPayBox();
-        }
+function showPaymentBreakdown() {
+    var pb = document.getElementById('paymentBox');
+    if (!pb) { return; }
+    pb.style.display = 'block';
+    updatePaymentBreakdown();
+}
 
         document.getElementById('calcRent').addEventListener('input', updatePaymentBreakdown);
         document.getElementById('calcDeposit').addEventListener('input', updatePaymentBreakdown);
