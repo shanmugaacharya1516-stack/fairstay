@@ -781,6 +781,40 @@
                             <button type="button" class="submit-btn" onclick="showLoanForm()" style="background:var(--accent);color:var(--text-dark);">
                             🏦 Get Property Loan Help
                             </button>
+                            <div id="loanForm" style="display:none; margin-top:14px;">
+    <div style="background:var(--bg-light); padding:18px; border-radius:12px;">
+        <h3 style="margin-bottom:6px;">🏦 Get Property Loan Help</h3>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+            Share your details and our team will help you explore suitable home-loan options.
+        </p>
+
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Name</label>
+                <input type="text" name="loan_name" id="loanName" placeholder="Your Full Name" class="form-control" required>
+            </div>
+
+            <div class="form-group full">
+                <label>Phone</label>
+                <input type="tel" name="loan_phone" id="loanPhone" placeholder="+91 XXXXX XXXXX" class="form-control" required>
+            </div>
+
+            <div class="form-group full">
+                <label>Email</label>
+                <input type="email" name="loan_email" id="loanEmail" placeholder="your@email.com" class="form-control" required>
+            </div>
+
+            <div class="form-group full">
+                <label>City</label>
+                <input type="text" name="loan_city" id="loanCity" placeholder="Your City" class="form-control" required>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="submitLoanRequest()">
+                🏦 Get Loan Assistance
+            </button>
+        </div>
+    </div>
+</div>
                         </div>
                     </form>
                 </div>
