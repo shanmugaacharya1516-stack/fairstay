@@ -1023,6 +1023,13 @@
 
         // Purpose tab switching
         function setPurpose(btn, purpose) {
+            function showLoanForm() {
+    const loanForm = document.getElementById('loanForm');
+    if (loanForm) {
+        loanForm.style.display = 'block';
+        loanForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
             document.querySelectorAll('.widget-tabs .tab-btn').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('purposeSelect').value = purpose;
