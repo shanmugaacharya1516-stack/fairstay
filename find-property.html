@@ -1030,6 +1030,68 @@
         loanForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 }
+            function submitLoanRequest() {
+    const name = document.getElementById('loanName').value.trim();
+    const phone = document.getElementById('loanPhone').value.trim();
+    const email = document.getElementById('loanEmail').value.trim();
+    const city = document.getElementById('loanCity').value.trim();
+
+    if (!name || !phone || !email || !city) {
+        alert('Please fill in all the details.');
+        return;
+    }
+
+    const btn = document.querySelector('#loanForm button[onclick="submitLoanRequest()"]');
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+    }
+
+    const formData = new FormData();
+
+    formData.append('name', name);
+    formData.append('phone', phone);
+    formData.append('email', email);
+    formData.append('city', city);
+
+    formData.append('service_type', 'Find Property');
+    formData.append('loan_request', 'yes');
+    formData.append('loan_service', 'Property Loan Assistance');
+
+    const reqId = 'LN-' + Date.now().toString(36).toUpperCase().slice(-6);
+    formData.append('request_id', reqId);
+
+    fsEnrich(formData, 'Find Property', 0, 'pending');
+
+    fsPost(formData)
+        .then(function () {
+            alert(
+                'Thank you! Your loan assistance request has been submitted.\n\n' +
+                'Request ID: ' + reqId
+            );
+
+            document.getElementById('loanForm').style.display = 'none';
+
+            document.getElementById('loanName').value = '';
+            document.getElementById('loanPhone').value = '';
+            document.getElementById('loanEmail').value = '';
+            document.getElementById('loanCity').value = '';
+
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🏦 Get Loan Assistance';
+            }
+        })
+        .catch(function () {
+            alert('Something went wrong. Please try again.');
+
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🏦 Get Loan Assistance';
+            }
+        });
+}
             document.querySelectorAll('.widget-tabs .tab-btn').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('purposeSelect').value = purpose;
