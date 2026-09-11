@@ -50,7 +50,43 @@
     <button class="btn yellow" onclick="updateStatus()">Update status</button>
     <div class="msg" id="updMsg"></div>
   </div>
+<h2>Property Management</h2>
+<div class="card">
+  <button class="btn" onclick="showPropertyForm()">🏠 Add Property</button>
+  <div class="msg">
+    Add a property with details and photos for FairStay listings.
+  </div>
+</div>
 
+<div class="card" id="propertyForm" style="display:none;">
+  <h3>Add New Property</h3>
+
+  <div class="grid">
+    <div>
+      <input type="text" id="propertyTitle" placeholder="Property Title">
+    </div>
+
+    <div>
+      <select id="propertyPurpose">
+        <option value="">Purpose</option>
+        <option value="Rent">Rent</option>
+        <option value="Sale">Sale</option>
+      </select>
+    </div>
+
+    <div>
+      <input type="text" id="propertyCity" placeholder="City">
+    </div>
+
+    <div>
+      <input type="text" id="propertyLocation" placeholder="Location / Area">
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button class="btn alt" onclick="hidePropertyForm()">Cancel</button>
+  </div>
+</div>
   <h2>Sheets in this spreadsheet</h2>
   <div class="card" id="sheets">
     <div class="msg">loading…</div>
@@ -89,6 +125,13 @@
         .withFailureHandler(function (e) { showMsg('statusMsg', 'Error: ' + (e.message || e), true); })
         .webRefreshReport();
     }
+    function showPropertyForm() {
+  document.getElementById('propertyForm').style.display = 'block';
+}
+
+function hidePropertyForm() {
+  document.getElementById('propertyForm').style.display = 'none';
+}
     function updateStatus() {
       var cid = document.getElementById('cid').value.trim();
       if (!cid) return showMsg('updMsg', 'Please enter a Customer ID.', true);
