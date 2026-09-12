@@ -952,15 +952,41 @@
             if (!grid) return;
 
             try {
-                const response = await fetch(
-                    SCRIPT_URL + '?action=get_properties'
-                );
+                const properties = await new Promise(function (resolve, reject) {
+    const callbackName = 'fsPropertiesCallback_' + Date.now();
+    const script = document.createElement('script');
 
-                if (!response.ok) {
-                    throw new Error('Failed to load properties');
-                }
+    const timeout = setTimeout(function () {
+        cleanup();
+        reject(new Error('Property API timeout'));
+    }, 10000);
 
-                const properties = await response.json();
+    function cleanup() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+
+        if (script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+    }
+
+    window[callbackName] = function (data) {
+        cleanup();
+        resolve(data);
+    };
+
+    script.onerror = function () {
+        cleanup();
+        reject(new Error('Failed to load properties'));
+    };
+
+    script.src =
+        SCRIPT_URL +
+        '?action=get_properties&callback=' +
+        encodeURIComponent(callbackName);
+
+    document.body.appendChild(script);
+});
 
                 const availableProperties = properties.filter(function (property) {
                     return String(property.status || '').toLowerCase() === 'available';
