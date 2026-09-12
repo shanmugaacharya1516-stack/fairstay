@@ -945,6 +945,183 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl9qoNVHnBDyan_k1-8tv1Z9r3zd-AJLCo6IOWvctUSDl83IzPlsQMLwHGcnr9W8vO/exec';
 
+                async function loadProperties() {
+            const grid = document.getElementById('propertiesGrid');
+            const resultCount = document.getElementById('resultCount');
+
+            if (!grid) return;
+
+            try {
+                const response = await fetch(
+                    SCRIPT_URL + '?action=get_properties'
+                );
+
+                if (!response.ok) {
+                    throw new Error('Failed to load properties');
+                }
+
+                const properties = await response.json();
+
+                const availableProperties = properties.filter(function (property) {
+                    return String(property.status || '').toLowerCase() === 'available';
+                });
+
+                if (!availableProperties.length) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            No properties are currently available.
+                        </div>
+                    `;
+
+                    if (resultCount) {
+                        resultCount.textContent = 'Showing 0 properties';
+                    }
+
+                    return;
+                }
+
+                grid.innerHTML = '';
+
+                availableProperties.forEach(function (property) {
+                    const purpose = String(property.purpose || '').toLowerCase() === 'sale'
+                        ? 'buy'
+                        : 'rent';
+
+                    const bhkText = String(property.bhk || '').toLowerCase();
+                    const bhkMatch = bhkText.match(/([1-4])\s*bhk/);
+                    const bhkFilter = bhkMatch ? bhkMatch[1] + 'bhk' : '';
+
+                    const price = Number(property.price || 0);
+
+                    let priceText = price
+                        ? '₹' + price.toLocaleString('en-IN')
+                        : 'Price on request';
+
+                    const priceSuffix = purpose === 'rent'
+                        ? ' /month'
+                        : '';
+
+                    const photoUrl =
+                        property.photo_urls && property.photo_urls.length
+                            ? property.photo_urls[0]
+                            : '';
+
+                    const card = document.createElement('div');
+
+                    card.className = 'property-card';
+                    card.dataset.city = String(property.city || '').toLowerCase();
+                    card.dataset.purpose = purpose;
+                    card.dataset.bhk = bhkFilter;
+
+                                        const imageBox = document.createElement('div');
+                    imageBox.className = 'property-img';
+
+                    const badge = document.createElement('span');
+                    badge.className = 'prop-badge' + (purpose === 'buy' ? ' sale' : '');
+                    badge.textContent = purpose === 'buy' ? 'For Sale' : 'For Rent';
+                    imageBox.appendChild(badge);
+
+                    if (photoUrl) {
+                        const img = document.createElement('img');
+                        img.src = photoUrl;
+                        img.alt = String(property.title || 'Property');
+                        imageBox.appendChild(img);
+                    } else {
+                        const noPhoto = document.createElement('div');
+                        noPhoto.className = 'empty-state';
+                        noPhoto.textContent = 'No photo available';
+                        imageBox.appendChild(noPhoto);
+                    }
+
+                    const body = document.createElement('div');
+                    body.className = 'prop-body';
+
+                    const title = document.createElement('div');
+                    title.className = 'prop-title';
+                    title.textContent = property.title || 'Property';
+                    body.appendChild(title);
+
+                    const location = document.createElement('div');
+                    location.className = 'prop-loc';
+                    location.textContent =
+                        '📍 ' + (property.location || property.city || '');
+                    body.appendChild(location);
+
+                    const priceEl = document.createElement('div');
+                    priceEl.className = 'prop-price';
+                    priceEl.textContent = priceText;
+
+                    const priceSmall = document.createElement('small');
+                    priceSmall.textContent = priceSuffix;
+                    priceEl.appendChild(priceSmall);
+
+                    body.appendChild(priceEl);
+
+                    const meta = document.createElement('div');
+                    meta.className = 'prop-meta';
+
+                    if (property.bhk) {
+                        const bhk = document.createElement('span');
+                        bhk.textContent = '🛏 ' + property.bhk;
+                        meta.appendChild(bhk);
+                    }
+
+                    if (property.area) {
+                        const area = document.createElement('span');
+                        area.textContent =
+                            '📐 ' +
+                            Number(property.area).toLocaleString('en-IN') +
+                            ' sq.ft';
+                        meta.appendChild(area);
+                    }
+
+                    body.appendChild(meta);
+
+                    const detailsBtn = document.createElement('button');
+                    detailsBtn.className = 'card-btn';
+                    detailsBtn.type = 'button';
+                    detailsBtn.textContent = 'Get Details';
+
+                    detailsBtn.addEventListener('click', function () {
+                        inquire(
+                            String(property.title || 'Property') +
+                            ' - ' +
+                            String(property.location || property.city || '')
+                        );
+                    });
+
+                    body.appendChild(detailsBtn);
+
+                    card.appendChild(imageBox);
+                    card.appendChild(body);
+
+                    grid.appendChild(card);
+                });
+
+                if (resultCount) {
+                    resultCount.textContent =
+                        'Showing ' + availableProperties.length +
+                        ' propert' +
+                        (availableProperties.length === 1 ? 'y' : 'ies');
+                }
+
+            } catch (error) {
+                console.error('Property loading error:', error);
+
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        Unable to load properties right now.
+                        Please try again later.
+                    </div>
+                `;
+
+                if (resultCount) {
+                    resultCount.textContent = 'Properties unavailable';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProperties);
         function showLoanForm() {
             const loanForm = document.getElementById('loanForm');
 
