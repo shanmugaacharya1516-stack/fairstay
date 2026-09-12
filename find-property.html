@@ -1127,6 +1127,39 @@
 
         // Search form submit
         function handleSearchSubmit(e) {
+    e.preventDefault();
+
+    const form = document.getElementById('searchForm');
+    const formData = new FormData(form);
+
+    const reqId = 'FP-' + Date.now().toString(36).toUpperCase().slice(-6);
+
+    formData.append('request_id', reqId);
+    formData.append('service_type', 'Find a Property');
+
+    // Move to property listings immediately
+    window.location.hash = 'listings';
+
+    // Submit enquiry in the background
+    try {
+        fsEnrich(formData, 'Find Property', 0, 'pending');
+
+        if (typeof fsPost === 'function') {
+            fsPost(formData).catch(function () {});
+        }
+    } catch (err) {
+        console.log('Property enquiry tracking error:', err);
+    }
+
+    // Clear search form after submission
+    form.reset();
+
+    document.getElementById('purposeSelect').value = 'rent';
+
+    document.querySelectorAll('.widget-tabs .tab-btn').forEach(function (t, i) {
+        t.classList.toggle('active', i === 0);
+    });
+}
             e.preventDefault();
             const form = document.getElementById('searchForm');
             const formData = new FormData(form);
