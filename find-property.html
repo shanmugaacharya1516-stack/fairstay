@@ -889,6 +889,94 @@
         </div>
     </section>
 
+    <!-- Property Details Modal -->
+<div id="propertyDetailsModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    z-index:9999;
+    overflow-y:auto;
+    padding:30px 16px;
+">
+    <div style="
+        max-width:900px;
+        margin:0 auto;
+        background:#fff;
+        border-radius:20px;
+        overflow:hidden;
+        box-shadow:0 20px 60px rgba(0,0,0,0.25);
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:18px 22px;
+            border-bottom:1px solid var(--border-color);
+        ">
+            <h2 id="detailsTitle" style="font-size:22px;">Property Details</h2>
+
+            <button type="button"
+                onclick="closePropertyDetails()"
+                style="
+                    border:none;
+                    background:#f1f5f3;
+                    width:38px;
+                    height:38px;
+                    border-radius:50%;
+                    font-size:22px;
+                    cursor:pointer;
+                ">
+                ×
+            </button>
+        </div>
+
+        <div style="padding:22px;">
+
+            <!-- Photos -->
+            <div id="detailsPhotos" style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                gap:10px;
+                margin-bottom:24px;
+            "></div>
+
+            <!-- Property information -->
+            <div id="detailsInfo" style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+                gap:14px;
+            "></div>
+
+            <!-- Description -->
+            <div style="margin-top:22px;">
+                <h3 style="margin-bottom:8px;">Property Description</h3>
+                <div id="detailsDescription" style="
+                    color:var(--text-muted);
+                    white-space:pre-line;
+                    line-height:1.7;
+                "></div>
+            </div>
+
+            <!-- Owner details CTA -->
+            <div style="
+                margin-top:28px;
+                padding-top:20px;
+                border-top:1px solid var(--border-color);
+                text-align:center;
+            ">
+                <button type="button"
+                    class="submit-btn"
+                    onclick="showOwnerDetailsForm()"
+                    style="max-width:360px;margin:0 auto;">
+                    📞 Get Owner Details
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
     <!-- Inquiry / Contact CTA -->
     <div class="cta-section" id="inquiry">
         <div class="container">
@@ -1109,12 +1197,8 @@
                     detailsBtn.textContent = 'Get Details';
 
                     detailsBtn.addEventListener('click', function () {
-                        inquire(
-                            String(property.title || 'Property') +
-                            ' - ' +
-                            String(property.location || property.city || '')
-                        );
-                    });
+    showPropertyDetails(property);
+});
 
                     body.appendChild(detailsBtn);
 
@@ -1288,12 +1372,143 @@
     });
 }
 
-        // Card "Get Details" -> scroll to inquiry form
-        function inquire(property) {
-            const req = document.querySelector('#inquiryForm [name="requirement"]');
-            if (req) req.value = property;
-            document.getElementById('inquiry').scrollIntoView({ behavior: 'smooth' });
-        }
+        // Property Details
+let selectedProperty = null;
+
+function showPropertyDetails(property) {
+    selectedProperty = property;
+
+    const modal = document.getElementById('propertyDetailsModal');
+    const title = document.getElementById('detailsTitle');
+    const photos = document.getElementById('detailsPhotos');
+    const info = document.getElementById('detailsInfo');
+    const description = document.getElementById('detailsDescription');
+
+    if (!modal || !title || !photos || !info || !description) {
+        return;
+    }
+
+    title.textContent = property.title || 'Property';
+
+    // Photos
+    photos.innerHTML = '';
+
+    const photoUrls = Array.isArray(property.photo_urls)
+        ? property.photo_urls
+        : [];
+
+    if (photoUrls.length) {
+        photoUrls.forEach(function (url) {
+            const img = document.createElement('img');
+
+            img.src = url;
+            img.alt = String(property.title || 'Property');
+            img.style.width = '100%';
+            img.style.height = '220px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '12px';
+            img.style.cursor = 'pointer';
+
+            img.onclick = function () {
+                window.open(url, '_blank');
+            };
+
+            photos.appendChild(img);
+        });
+    } else {
+        const noPhoto = document.createElement('div');
+
+        noPhoto.textContent = 'No photos available';
+        noPhoto.style.padding = '40px';
+        noPhoto.style.textAlign = 'center';
+        noPhoto.style.color = 'var(--text-muted)';
+        noPhoto.style.background = 'var(--bg-light)';
+        noPhoto.style.borderRadius = '12px';
+
+        photos.appendChild(noPhoto);
+    }
+
+    // Property information
+    info.innerHTML = '';
+
+    addPropertyDetail(info, 'Property Code', property.property_code);
+    addPropertyDetail(info, 'Purpose', property.purpose);
+    addPropertyDetail(info, 'City', property.city);
+    addPropertyDetail(info, 'Location / Area', property.location);
+    addPropertyDetail(info, 'Property Type', property.property_type);
+    addPropertyDetail(info, 'BHK', property.bhk);
+    addPropertyDetail(
+        info,
+        'Area',
+        property.area
+            ? Number(property.area).toLocaleString('en-IN') + ' sq.ft'
+            : ''
+    );
+    addPropertyDetail(
+        info,
+        'Price',
+        property.price
+            ? '₹' + Number(property.price).toLocaleString('en-IN')
+            : 'Price on request'
+    );
+    addPropertyDetail(
+        info,
+        'Security Deposit',
+        property.deposit
+            ? '₹' + Number(property.deposit).toLocaleString('en-IN')
+            : ''
+    );
+
+    description.textContent =
+        property.description || 'No additional description available.';
+
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addPropertyDetail(container, label, value) {
+    if (!value) {
+        return;
+    }
+
+    const box = document.createElement('div');
+
+    box.style.padding = '14px';
+    box.style.background = 'var(--bg-light)';
+    box.style.borderRadius = '12px';
+
+    const labelEl = document.createElement('div');
+
+    labelEl.textContent = label;
+    labelEl.style.fontSize = '12px';
+    labelEl.style.fontWeight = '700';
+    labelEl.style.color = 'var(--text-muted)';
+    labelEl.style.marginBottom = '4px';
+
+    const valueEl = document.createElement('div');
+
+    valueEl.textContent = String(value);
+    valueEl.style.fontWeight = '700';
+
+    box.appendChild(labelEl);
+    box.appendChild(valueEl);
+    container.appendChild(box);
+}
+
+function closePropertyDetails() {
+    const modal = document.getElementById('propertyDetailsModal');
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
+
+    document.body.style.overflow = '';
+}
+
+function showOwnerDetailsForm() {
+    // Step 2 will add the customer name/phone/email form here.
+    alert('Owner details form will be added in the next step.');
+}
 
         // Inquiry form submit
         function handleInquirySubmit(e) {
