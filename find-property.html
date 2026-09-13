@@ -1401,7 +1401,7 @@ function showPropertyDetails(property) {
         photoUrls.forEach(function (url) {
             const img = document.createElement('img');
 
-            img.src = url;
+            img.src = url.replace('https://drive.google.com/uc?export=view&id=', 'https://drive.google.com/thumbnail?id=') + '&sz=w1200';
             img.alt = String(property.title || 'Property');
             img.style.width = '100%';
             img.style.height = '220px';
