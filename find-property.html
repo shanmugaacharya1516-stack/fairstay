@@ -1137,7 +1137,7 @@
 
                     if (photoUrl) {
                         const img = document.createElement('img');
-                        img.src = photoUrl;
+                        img.src = photoUrl.replace('https://drive.google.com/uc?export=view&id=', 'https://drive.google.com/thumbnail?id=') + '&sz=w1200';
                         img.alt = String(property.title || 'Property');
                         imageBox.appendChild(img);
                     } else {
