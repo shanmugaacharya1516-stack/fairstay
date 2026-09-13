@@ -1506,8 +1506,75 @@ function closePropertyDetails() {
 }
 
 function showOwnerDetailsForm() {
-    // Step 2 will add the customer name/phone/email form here.
-    alert('Owner details form will be added in the next step.');
+    if (!selectedProperty) {
+        alert('Please select a property first.');
+        return;
+    }
+
+    var name = localStorage.getItem('fs_name') || '';
+    var phone = localStorage.getItem('fs_phone') || '';
+    var email = localStorage.getItem('fs_email') || '';
+    var city = localStorage.getItem('fs_city') || '';
+    var customerId = localStorage.getItem('fs_customer_id') || '';
+
+    if (!name || !phone || !email || !city) {
+        alert('Please complete your details first.');
+        return;
+    }
+
+    var confirmRequest = confirm(
+        'Request owner details for:\n\n' +
+        selectedProperty.title + '\n' +
+        '📍 ' + selectedProperty.location + '\n\n' +
+        'We will contact you using your existing details.\n\n' +
+        'Name: ' + name + '\n' +
+        'Phone: ' + phone + '\n\n' +
+        'Continue?'
+    );
+
+    if (!confirmRequest) {
+        return;
+    }
+
+    var formData = new FormData();
+
+    formData.append('customer_id', customerId);
+    formData.append('name', name);
+    formData.append('phone', phone);
+    formData.append('email', email);
+    formData.append('city', city);
+
+    formData.append('service_type', 'Find Property');
+    formData.append('property_code', selectedProperty.property_code || '');
+    formData.append('property_title', selectedProperty.title || '');
+    formData.append('property_location', selectedProperty.location || '');
+
+    var reqId =
+        'PO-' + Date.now().toString(36).toUpperCase().slice(-6);
+
+    formData.append('request_id', reqId);
+
+    try {
+        fsEnrich(formData, 'Find Property', 0, 'pending');
+    } catch (err) {
+        console.log('Owner enquiry tracking error:', err);
+    }
+
+    if (typeof fsPost !== 'function') {
+        alert('Unable to submit right now. Please try again.');
+        return;
+    }
+
+    fsPost(formData)
+        .then(function () {
+            alert(
+                'Thank you! Your owner details request has been submitted.\n\n' +
+                'Request ID: ' + reqId
+            );
+        })
+        .catch(function () {
+            alert('Unable to submit right now. Please try again.');
+        });
 }
 
         // Inquiry form submit
