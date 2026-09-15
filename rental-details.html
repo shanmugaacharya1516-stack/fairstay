@@ -1591,7 +1591,9 @@ function showPaymentBreakdown() {
             e.preventDefault();
             var form = document.getElementById('rentalForm');
             var data = new FormData(form);
-            var btn = document.getElementById('submitBtn');
+data.append('plan', selectedPlan);
+
+var btn = document.getElementById('submitBtn');
             btn.textContent = 'Submitting...';
             btn.disabled = true;
             data.append('has_own_draft', 'no');
