@@ -1597,7 +1597,11 @@ var btn = document.getElementById('submitBtn');
             btn.textContent = 'Submitting...';
             btn.disabled = true;
             data.append('has_own_draft', 'no');
-            fsEnrich(data, null, fsRentalTotalFrom(form), 'pending');
+
+var previewHtml = document.getElementById('agreementPreview').innerHTML;
+data.append('preview_html', previewHtml);
+
+fsEnrich(data, null, fsRentalTotalFrom(form), 'pending');
 
             function showDetailsSuccess() {
                 document.getElementById('draftChoiceSection').style.display = 'none';
