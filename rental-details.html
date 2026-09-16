@@ -1374,6 +1374,7 @@
             document.getElementById('pbPlanName').textContent = '(' + (selectedPlan || 'Standard') + ' Plan)';
             document.getElementById('pbPlan').textContent = fmtINR(Plan);
             document.getElementById('razorpayPayBtn').textContent = 'Pay ' + fmtINR(total);
+            document.getElementById('pbTotal').textContent = fmtINR(total);
 
             document.getElementById('calcDetail').innerHTML = 'Formula: (' +
                 fmtINR(rent) + ' × 11 + ' + fmtINR(dep) + ') × 0.5% = ' + fmtINR(rawStamp) +
